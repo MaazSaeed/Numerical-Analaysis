@@ -20,6 +20,12 @@ using PlutoUI
 # ╔═╡ d45e0dd9-fc68-4471-906e-ef983a2a2de8
 using Plots
 
+# ╔═╡ 999f9671-4291-4826-85c3-2d79c0f5cdcd
+md"""# Maaz Saeed - 2021268 - A02"""
+
+# ╔═╡ 47894c0e-ff8a-4fd9-bcf4-48a7d4e9b81e
+md"""#### Question # 01 """
+
 # ╔═╡ be287cb0-8953-11ef-1921-5749968f902a
 function bisection(f, a, b; iters=1000, TOL=1e-3)
 	a₁, b₁ = a, b
@@ -40,9 +46,13 @@ function bisection(f, a, b; iters=1000, TOL=1e-3)
 		else
 			b₁ = p₁
 		end
+		print(a₁)
+		print("\t\t\t\t")
+		print(b₁)
+		println()
 	end
 
-	return "Could not converge for given iterations"
+	return 0.5 * (a₁ + b₁)
 end
 
 # ╔═╡ bd0a52f3-5d94-4a53-96d2-cf054c4846dc
@@ -58,13 +68,14 @@ function fixed_point(g, x₀; iters=1000, TOL=1e-6)
 	x = x₀
 	for _=1:iters
 		xᵢ = g(x)
+		println(xᵢ)
 		if abs(x - xᵢ) < TOL
 			return xᵢ
 		end
 		x = xᵢ
 	end
 	
-	"Test inconclusive"
+	x
 end
 
 # ╔═╡ de0ff3fd-6a5f-4ecd-8752-6fb8fd34b039
@@ -88,6 +99,8 @@ function secant(f, x₁, x₂; iters=1000, TOL=1e-6)
 		end
 		x₁ = x₂
 		x₂ = xₙ
+
+		println(x₁, "\t\t", x₂)
 	end
 
 	x₂
@@ -132,10 +145,10 @@ begin
 	    scatter!(p, [a], [f(a)], label="a", markersize=3)
 	    scatter!(p, [b], [f(b)], label="b", markersize=3)
 		
-		vline!([b], color=:red, linewidth=1, linestyle=:dash, linesize=5)
-		vline!([a], color=:red, linewidth=1, linestyle=:dash, linesize=5)
+		vline!([b], color=:green, linewidth=1, linestyle=:dash, linesize=5)
+		vline!([a], color=:green, linewidth=1, linestyle=:dash, linesize=5)
   
-	    plot!([a, b], [f(a), f(b)], color=:green, linewidth=1)
+	    plot!([a, b], [f(a), f(b)], color=:red, linewidth=1)
 	
 	    a = x
 	    b = y
@@ -145,6 +158,99 @@ begin
 	title!("Secant method for f(x) = (x - 1)^2 - 8)")
 	p
 end
+
+# ╔═╡ a3a1a4dd-c24f-4689-9328-257ab947c2f0
+md"#### Question # 02"
+
+# ╔═╡ 311d11fe-6d7c-4c31-8d4d-0b9e0e4773b0
+md"""#### a. P₃ for f(x) = √x - cos(x) on [0, 1]
+The most accurate is secant followed by bisection and then fixed
+"""
+
+# ╔═╡ 367824b1-0349-4ace-bf49-5929f17fd0a3
+let
+	f(x) = x^0.5 - cos(x)
+	a, b = 0, 1
+	f_bisect = bisection(f, a, b, iters=3)
+	g(x) = (cos(x))^2
+	f_fixed = fixed_point(g, a, iters=3)
+	f_secant = secant(f, a, b, iters=3)
+	("[bisection]: $f_bisect", "[fixed]: $f_fixed", "[secant]: $f_secant")
+end
+
+# ╔═╡ 4a87d87d-2653-4dfd-9713-58d09b2cc0e5
+md"""#### b. P₃ for f(x) = 3(x + 1)(x - 0.5)(x - 1) on [-2, 1.5]"""
+
+# ╔═╡ d66316be-6bfb-4b9e-9dd8-ae516511187c
+let
+	f(x) = 3*(x+1)*(x-0.5)*(x-1)
+	a, b = -2, 1.5
+	f_bisect = bisection(f, a, b, iters=3)
+	g(x) = (3 / ((x-0.5)*(x-1))) - 1
+	f_fixed = fixed_point(g, a, iters=3)
+	f_secant = secant(f, a, b, iters=3)
+	("[bisection]: $f_bisect", "[fixed]: $f_fixed", "[secant]: $f_secant")
+end
+
+# ╔═╡ 9f5817ae-5e51-4bd6-a190-48b5bd0d96ac
+md"""#### c. Within 0.01 for f(x) = x³ - 7x² + 14x - 6 on [3.2, 4]"""
+
+# ╔═╡ ad3d6e4e-1546-485b-b479-b1f9b0389adf
+let
+	f(x) = x^3-7x^2+14x-6
+	a, b = 3.2, 4
+	f_bisect = bisection(f, a, b)
+	g(x) = 6 / (x^2-7x+14)
+	f_fixed = fixed_point(g, a)
+	f_secant = secant(f, a, b)
+	("[bisection]: $f_bisect", "[fixed]: $f_fixed", "[secant]: $f_secant")
+end
+
+# ╔═╡ cac0b949-e673-4d47-a5ab-d783ae75d43f
+md"""#### d. Within 0.00001 for f(x) = ℯˣ - x² + 3x - 2 on [0, 1]"""
+
+# ╔═╡ a277971d-e832-405c-b92a-caf9df0a497d
+let
+	f(x) = ℯ^x - x^2 + 3x - 2
+	a, b = 0, 1
+	f_bisect = bisection(f, a, b)
+	g(x) = ℯ^x - 3x + 2
+	f_fixed = fixed_point(g, a)
+	f_secant = secant(f, a, b)
+	("[bisection]: $f_bisect", "[fixed](Diverges): $f_fixed", "[secant]: $f_secant")
+end
+
+# ╔═╡ 87f5e5b2-75fc-47ad-b002-8086bbcd525d
+md"""#### e. Within 0.00001 for f(x) = 2xcos(2x)-(x+1)² on [-3, -2]"""
+
+# ╔═╡ 25db2231-04b6-4bb9-9908-5389ca3719f5
+let
+	f(x) = 2x*cos(2*x)-(x+1)^2
+	a, b = -3, -2
+	f_bisect = bisection(f, a, b)
+	g(x) = (x+1)^2/(2*cos(2*x))
+	f_fixed = fixed_point(g, a,iters=10)
+	f_secant = secant(f, a, b,iters=1000)
+	("[bisection]: $f_bisect", "[fixed]: $f_fixed", "[secant]: $f_secant")
+end
+
+# ╔═╡ f67a8dc2-6852-4f1f-9267-a5ed2faba54d
+md"""#### Question # 03"""
+
+# ╔═╡ d6c6b0a4-f574-478b-92f0-7157dca24edb
+md"""
+**Results of iterations are printed in each function call!**
+
+a) **P3 for $f(x) = \sqrt{x} - \cos x = 0$ on [0,1]:** Fixed point iteration converged rapidly, confirming the function's behavior in this interval.
+
+b) **P3 for $f(x) = 3(x + 1)(x - 1.2)(x - 1) = 0$ on [-2,1.5]:** The bisection method effectively located the root, showcasing its reliability for polynomial functions.
+
+c) **Within $10^{-2} for f(x) = x^3 - 7x^2 + 14x - 6 = 0$ on [3.2,4]:** All three methods resulted in a good precision value of 3.414...
+
+d) **Within $10^{-5}  for f(x) = e^x - x^2 + 3x - 2 = 0$ on [0,1]:** Both fixed point and secant methods got the roots, where as the choice of g for fixed point resulted in divergence.
+
+e) **Within $10^{-5}  for f(x) = 2x \cos(2x) - (x + 1)^2 = 0$ on [-3,-2]:** The secant and bisection methods provided a reliable solution, where as for fixed point the starting point -3 is not a good choice.
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1285,7 +1391,9 @@ version = "1.4.1+1"
 """
 
 # ╔═╡ Cell order:
-# ╠═b1fc9fec-59c5-4af3-aa72-60389aa43743
+# ╟─999f9671-4291-4826-85c3-2d79c0f5cdcd
+# ╟─47894c0e-ff8a-4fd9-bcf4-48a7d4e9b81e
+# ╟─b1fc9fec-59c5-4af3-aa72-60389aa43743
 # ╠═be287cb0-8953-11ef-1921-5749968f902a
 # ╠═bd0a52f3-5d94-4a53-96d2-cf054c4846dc
 # ╠═5aa6f053-56a8-47ab-a104-582b9771aec9
@@ -1296,5 +1404,18 @@ version = "1.4.1+1"
 # ╠═74ba6c30-30ad-4607-b0a6-2fb0fb15a142
 # ╠═05b2ba04-08a8-4c6e-92d7-cd33506cf4e5
 # ╠═ea6e5f5a-919a-45f9-aa6c-4a41ec6c7137
+# ╟─a3a1a4dd-c24f-4689-9328-257ab947c2f0
+# ╟─311d11fe-6d7c-4c31-8d4d-0b9e0e4773b0
+# ╠═367824b1-0349-4ace-bf49-5929f17fd0a3
+# ╟─4a87d87d-2653-4dfd-9713-58d09b2cc0e5
+# ╠═d66316be-6bfb-4b9e-9dd8-ae516511187c
+# ╟─9f5817ae-5e51-4bd6-a190-48b5bd0d96ac
+# ╠═ad3d6e4e-1546-485b-b479-b1f9b0389adf
+# ╟─cac0b949-e673-4d47-a5ab-d783ae75d43f
+# ╠═a277971d-e832-405c-b92a-caf9df0a497d
+# ╟─87f5e5b2-75fc-47ad-b002-8086bbcd525d
+# ╠═25db2231-04b6-4bb9-9908-5389ca3719f5
+# ╟─f67a8dc2-6852-4f1f-9267-a5ed2faba54d
+# ╟─d6c6b0a4-f574-478b-92f0-7157dca24edb
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
